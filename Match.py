@@ -8,10 +8,14 @@ print(f"当前工作目录: {os.getcwd()}")
 
 
 bait = cv2.imread("icon/bait.png")
+close = cv2.imread("icon/close.png")
+maximize = cv2.imread("icon/maximize.png")
+purchase = cv2.imread("icon/purchase.png")
 test = cv2.imread("test/fishing_bait.png")
 
 if bait is None:
     raise ValueError("无法读取 bait.png")
+#todo 防御措施补全
 
 print(f"成功读取 bait.png，尺寸: {bait.shape}")
 
@@ -28,7 +32,7 @@ def matching(img1,img2):
     #绘制矩形并显示
     h,w=img2.shape
     bottom_right=(min_loc[0] + w, min_loc[1] + h)
-    cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 3) 
+    cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2) 
     cv2.imshow('Detected Range',img1)
     
     return min_loc
