@@ -1,16 +1,13 @@
 import cv2
 import numpy as py
-
 import win32gui
+import game_capture
+import Match
 
 
-#hwnd= Handle to a Window
-#hwnd=986274 | class=UnrealWindow | title='异环  '  
+hwnd=game_capture.find_window("异环")
+#执行一次截图标注
+img=game_capture.capture_game(hwnd)
+Match.matching(img,Match.bait)
 
-hwnd = win32gui.FindWindow('UnrealWindow',u'异环  ')
-if hwnd == 0:
-    print('窗口未找到')
-
-hwnd_dc = win32gui.GetWindowDC(hwnd)
-mfc_dc =  win32ui.CreateDCFromHandle(hwnd_dc)
-save_dc = mfc_dc.CreateCompatibleDC()
+cv2.waitKey(0)
