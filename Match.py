@@ -11,7 +11,9 @@ bait = cv2.imread("icon/bait.png")
 close = cv2.imread("icon/close.png")
 maximize = cv2.imread("icon/maximize.png")
 purchase = cv2.imread("icon/purchase.png")
-test = cv2.imread("test/fishing_bait.png")
+test = cv2.imread("test/test.png")
+judge = cv2.imread("icon/judge.png")
+needle = cv2.imread("icon/needle.png")
 
 if bait is None:
     raise ValueError("无法读取 bait.png")
@@ -26,15 +28,22 @@ def matching(img1,img2):
     img2=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
 
     #匹配图像并返回坐标min_loc
-    res=cv2.matchTemplate(img1_gray,img2,cv2.TM_SQDIFF)
+    res=cv2.matchTemplate(img1_gray,img2,cv2.TM_SQDIFF_NORMED)
     min_val,max_val,min_loc,max_loc=cv2.minMaxLoc(res)
-
-    #绘制矩形并显示
-    h,w=img2.shape
-    bottom_right=(min_loc[0] + w, min_loc[1] + h)
-    cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2) 
-    cv2.imshow('Detected Range',img1)
+    confident = 1.0 - min_val
     
-    return min_loc
+    if confident>0.9:
+        #绘制矩形并示
+        h,w=img2.shape
+        bottom_right=(min_loc[0] + w, min_loc[1] + h)
+        cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2) 
+        cv2.imshow('press q/Esc quit',img1)
+        return min_loc
+    else:
+        cv2.imshow('press q/Esc quit',img1)
+        #低置信度不采用
+        return None
+    
+    
 
 cv2.waitKey(0)

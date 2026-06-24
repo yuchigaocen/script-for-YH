@@ -6,9 +6,11 @@ import Match
 
 
 hwnd=game_capture.find_window("异环")
+game_capture.realtime_capture(hwnd,Match.judge)
+
 #执行一次截图标注
-img=game_capture.capture_game(hwnd)
-Match.matching(img,Match.bait)
+#img=game_capture.capture_game(hwnd)
+#Match.matching(Match.test,Match.judge)
 
 
 cv2.waitKey(0)

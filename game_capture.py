@@ -3,6 +3,7 @@ import cv2
 import win32gui
 import time
 import os
+import Match
 
 def find_window(title_keyword):
     result = []
@@ -41,3 +42,32 @@ def img_save(img):
     path = f"screenshots/game_{time.strftime('%Y%m%d_%H%M%S')}.png"
     cv2.imwrite(path, img)
     print(f"已保存: {path}")
+    
+def realtime_capture(hwnd,template):
+    left, top, right, bottom = win32gui.GetClientRect(hwnd)
+    # ClientToScreen 将客户区左上角(0,0)转换为屏幕坐标
+    left, top = win32gui.ClientToScreen(hwnd, (left, top))
+    right, bottom = win32gui.ClientToScreen(hwnd, (right, bottom))
+    region = (left,top,right,bottom)
+    
+    # 创建相机并启动连续捕获
+    camera = dxcam.create(output_color="BGR")
+    camera.start(region=region, target_fps=60)
+    
+    print("开始实时识别，按 q/Esc 退出")
+    
+    while True:
+        frame=camera.get_latest_frame()
+        
+        
+        if template is None:
+            print("警告: 未找到模板图片，跳过匹配")
+            cv2.imshow("press q/Esc quit", frame)
+        else:
+            Match.matching(frame,template)
+            
+        
+        # 按 q 或 Esc 退出
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q') or key == 27:
+            break
