@@ -25,27 +25,28 @@ print(f"成功读取 bait.png，尺寸: {bait.shape}")
 #图一为被匹配，图二为匹配
 def matching(img1,img2,confident_aim=0.9):
     img1_gray=cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY,dstCn=1) #转换为单通道灰度图像，增加运算效率
-    img2=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
+    img2_gray=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
 
     #匹配图像并返回坐标min_loc
-    res=cv2.matchTemplate(img1_gray,img2,cv2.TM_SQDIFF_NORMED)
+    res=cv2.matchTemplate(img1_gray,img2_gray,cv2.TM_SQDIFF_NORMED)
     min_val,max_val,min_loc,max_loc=cv2.minMaxLoc(res)
     confident = 1.0 - min_val
-    
+
     if confident>confident_aim:
-        #绘制矩形并示
-        h,w=img2.shape
-        bottom_right=(min_loc[0] + w, min_loc[1] + h)
-        cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2)
-        cv2.putText(img1, f"{confident:.2f}", min_loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 3, cv2.LINE_AA)
-        cv2.imshow('press q/Esc quit', img1)
-        return min_loc
+        return min_loc,confident
     else:
-        cv2.imshow('press q/Esc quit',img1)
         #低置信度不采用
+        return None,None
+
+def draw_match(img,loc,template,confident):
+    """在图像上绘制匹配结果"""
+    if loc is None:
         return None
-    
-    
+    h,w=template.shape[:2]
+    bottom_right=(loc[0] + w, loc[1] + h)
+    cv2.rectangle(img, loc, bottom_right, (0, 0, 255), 2)
+    cv2.putText(img, f"{confident:.2f}", loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 3, cv2.LINE_AA)
+        
 
 def save_screenshot(img):
     """保存截图到 screenshots 文件夹
