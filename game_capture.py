@@ -71,3 +71,21 @@ def realtime_capture(hwnd,template):
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q') or key == 27:
             break
+        
+#创建画面帧生成器  fix:解耦合      
+def frame_generator(hwnd,target_fps=60):
+    left, top, right, bottom = win32gui.GetClientRect(hwnd)
+    #坐标转换
+    left, top = win32gui.ClientToScreen(hwnd, (left, top))
+    right, bottom = win32gui.ClientToScreen(hwnd, (right, bottom))
+    region = (left,top,right,bottom)
+    
+    camera = dxcam.create(output_color="BGR")
+    camera.start(region=region, target_fps=60)
+    
+    while True:
+        frame = camera.get_latest_frame()
+        if frame is not None:
+            
+            yield frame
+            #yield返回一个可迭代的生成器对象，可以使用for循环遍历来提取。

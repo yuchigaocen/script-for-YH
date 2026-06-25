@@ -23,7 +23,7 @@ print(f"成功读取 bait.png，尺寸: {bait.shape}")
 
 
 #图一为被匹配，图二为匹配
-def matching(img1,img2):
+def matching(img1,img2,confident_aim=0.9):
     img1_gray=cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY,dstCn=1) #转换为单通道灰度图像，增加运算效率
     img2=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
 
@@ -32,12 +32,13 @@ def matching(img1,img2):
     min_val,max_val,min_loc,max_loc=cv2.minMaxLoc(res)
     confident = 1.0 - min_val
     
-    if confident>0.9:
+    if confident>confident_aim:
         #绘制矩形并示
         h,w=img2.shape
         bottom_right=(min_loc[0] + w, min_loc[1] + h)
-        cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2) 
-        cv2.imshow('press q/Esc quit',img1)
+        cv2.rectangle(img1, min_loc, bottom_right, (0, 0, 255), 2)
+        cv2.putText(img1, f"{confident:.2f}", min_loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 3, cv2.LINE_AA)
+        cv2.imshow('press q/Esc quit', img1)
         return min_loc
     else:
         cv2.imshow('press q/Esc quit',img1)
@@ -46,4 +47,16 @@ def matching(img1,img2):
     
     
 
-cv2.waitKey(0)
+def save_screenshot(img):
+    """保存截图到 screenshots 文件夹
+
+    Args:
+        img: cv2 图片数组
+    """
+    import time
+    os.makedirs("screenshots", exist_ok=True)
+    path = f"screenshots/screenshot_{time.strftime('%Y%m%d_%H%M%S')}.png"
+    cv2.imwrite(path, img)
+    print(f"已保存: {path}")
+    return path
+
