@@ -1,2 +1,4 @@
 test/
 CLAUDE.md
+__pycache__/
+screenshots/

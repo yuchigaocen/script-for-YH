@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import game_capture
 import os
 
 # 调试信息
@@ -14,18 +13,33 @@ purchase = cv2.imread("icon/purchase.png")
 test = cv2.imread("test/test.png")
 judge = cv2.imread("icon/judge.png")
 needle = cv2.imread("icon/needle.png")
+closetip = cv2.imread("icon/closetip.png")
 
-if bait is None:
-    raise ValueError("无法读取 bait.png")
-#todo 防御措施补全
+if closetip is None:
+    raise ValueError("无法读取 closetip.png")
+if judge is None:
+    raise ValueError("无法读取 judge.png")
+if needle is None:
+    raise ValueError("无法读取 needle.png")
 
-print(f"成功读取 bait.png，尺寸: {bait.shape}")
+print(f"成功读取 closetip.png，尺寸: {closetip.shape}")
+print(f"成功读取 judge.png，尺寸: {judge.shape}")
+print(f"成功读取 needle.png，尺寸: {needle.shape}")
 
+# 预计算模板灰度图，避免每帧重复转换
+_judge_gray = cv2.cvtColor(judge, cv2.COLOR_BGR2GRAY)
+_needle_gray = cv2.cvtColor(needle, cv2.COLOR_BGR2GRAY)
 
 #图一为被匹配，图二为匹配
 def matching(img1,img2,confident_aim=0.9):
-    img1_gray=cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY,dstCn=1) #转换为单通道灰度图像，增加运算效率
-    img2_gray=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
+    img1_gray=cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY,dstCn=1)
+    # 模板是固定图片，用预计算的灰度图
+    if img2 is judge:
+        img2_gray = _judge_gray
+    elif img2 is needle:
+        img2_gray = _needle_gray
+    else:
+        img2_gray=cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY,dstCn=1)
 
     #匹配图像并返回坐标min_loc
     res=cv2.matchTemplate(img1_gray,img2_gray,cv2.TM_SQDIFF_NORMED)
